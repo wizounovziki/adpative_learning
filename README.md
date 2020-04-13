@@ -21,7 +21,7 @@ Run the front-end,take port 3000 as a default.
 ### pip install -r requirements.txt 
 In the directory,run it to install the libraries for back-end.We are using cuda 10 if need gpu,so you might have to change some libs if you are using the different version of cuda.
 There might be some missing libs in the txt file,please try to implement accordingly.
-There might be situationns when dlib is not installed successfully.Please run pip install cmake and then pip install dlib manually.
+There might be situationns when dlib is not installed successfully.Please run `pip install cmake` and then `pip install dlib` manually.
 
 ### install mysql and set up
 In app.py you can found `app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://debian-sys-maint:yGdsPQQ7Zl7lVUCi@localhost/adaptive_learning'`;
