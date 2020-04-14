@@ -21,12 +21,9 @@ import cv2
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 app = Flask(__name__)
-app.config['FACE_DETECTION_MODEL'] = "./models/face_detection/ultra_light_640_opt.onnx"
-app.config['FACE_RECOGNITION_MODEL'] = "./models/face_recognition/mfn/"
-app.config['FACIAL_LANDMARK'] = 'models/facial_landmark/shape_predictor_5_face_landmarks.dat'
 app.config['EYE_GAZING_HOURGLASS'] = './models/eye_gazing/ELG_i180x108_f60x36_n64_m3/checkpoints/hourglass/'
 app.config['EYE_GAZING_RADIUS'] = './models/eye_gazing/ELG_i180x108_f60x36_n64_m3/checkpoints/radius/'
-app.config['EASY_EYE_GAZING'] = './models/eye_gazing/simple_eye_gazing/shape_predictor_68_face_landmarks.dat'
+app.config['EASY_EYE_GAZING'] = './models/distraction_model/shape_predictor_68_face_landmarks.dat'
 app.config['EMBEDDING_FOLDER'] = './storage/embeddings'
 app.config['META_FOLDER'] = './storage/identity_meta'
 app.config['IMAGE_UPLOAD_FOLDER'] = './storage/uploads/images'
@@ -56,15 +53,10 @@ if not os.path.exists(app.config['IMAGE_UPLOAD_FOLDER']):
 # initialize
 
 print(" * Loading face aligner")
-shape_predictor = dlib.shape_predictor(app.config['FACIAL_LANDMARK'])
-fa = face_utils.facealigner.FaceAligner(shape_predictor, desiredFaceWidth=112, desiredLeftEye=(0.3, 0.3))
 print(' * Loading face recognition model')
 tf_session = tf.Session()
-saver = tf.train.import_meta_graph(os.path.join(app.config['FACE_RECOGNITION_MODEL'], 'mfn.ckpt.meta'))
-saver.restore(tf_session, os.path.join(app.config['FACE_RECOGNITION_MODEL'], 'mfn.ckpt'))
 print(" * Loading eye gazing model")
 eye_predictor = dlib.shape_predictor(app.config['EASY_EYE_GAZING'])
-gt = GazeTracking(eye_predictor)
 print(" * Loading distraction model")
 emotion_model = load_model('./models/distraction_model/emotion_recognition.h5')
 detector = dlib.get_frontal_face_detector()
