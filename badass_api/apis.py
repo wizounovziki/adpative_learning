@@ -5,7 +5,7 @@
 # @Last Modified time: 2019-12-11 12:39:06
 import os, uuid, json, cv2
 import numpy as np
-from app import app,tf_session, fa, gt, emotion_model,faceCascade,detector,eye_predictor,db
+from app import app, emotion_model,faceCascade,detector,eye_predictor,db
 from werkzeug.utils import secure_filename
 from flask import Blueprint, jsonify, send_from_directory, request,Response,g
 from utils.register import register_face
