@@ -5,7 +5,7 @@
 # @Last Modified time: 2019-12-11 12:39:06
 import os, uuid, json, cv2
 import numpy as np
-from app import app, ort_session, tf_session, fa, gt, emotion_model,faceCascade,detector,eye_predictor,db
+from app import app, emotion_model,faceCascade,detector,eye_predictor,db
 from werkzeug.utils import secure_filename
 from flask import Blueprint, jsonify, send_from_directory, request,Response,g
 from utils.register import register_face
@@ -654,11 +654,11 @@ def distraction():
 
         try:
             # using hard coded distraction model.
-            msg = easy_defined_distraction(img)
+            # msg = easy_defined_distraction(img)
 
             # using the engagement model.
-            # ana = analysis(emotion_model,detector,eye_predictor,faceCascade)
-            # msg = ana.detect_face(img)
+            ana = analysis(emotion_model,detector,eye_predictor,faceCascade)
+            msg = ana.detect_face(img)
         except:
             msg = "lost"
         try:
