@@ -74,22 +74,7 @@ for file in os.listdir(app.config['META_FOLDER']):
         file_path = os.path.join(app.config['EMBEDDING_FOLDER'], data['embedding'])
         embeddings.append(pickle.load(open(file_path, 'rb')))
 
-if __name__ == '__main__':
-    # from apis import register_api
-    # app.register_blueprint(register_api)
-
-    # from apis import detect_face_api
-    # app.register_blueprint(detect_face_api)
-
-    # from apis import recognize_face_api
-    # app.register_blueprint(recognize_face_api)
-
-    # from apis import eye_gazing_api
-    # app.register_blueprint(eye_gazing_api)
-    
-    # from apis import head_motion_api
-    # app.register_blueprint(head_motion_api)
-    
+if __name__ == '__main__':   
     from apis import adaptive_api
     app.register_blueprint(adaptive_api)
 
