@@ -654,11 +654,11 @@ def distraction():
 
         try:
             # using hard coded distraction model.
-            msg = easy_defined_distraction(img)
+            # msg = easy_defined_distraction(img)
 
             # using the engagement model.
-            # ana = analysis(emotion_model,detector,eye_predictor,faceCascade)
-            # msg = ana.detect_face(img)
+            ana = analysis(emotion_model,detector,eye_predictor,faceCascade)
+            msg = ana.detect_face(img)
         except:
             msg = "lost"
         try:
