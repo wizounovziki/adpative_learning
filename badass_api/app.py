@@ -54,8 +54,7 @@ if not os.path.exists(app.config['IMAGE_UPLOAD_FOLDER']):
     os.makedirs(app.config['IMAGE_UPLOAD_FOLDER'])
 
 # initialize
-print(" * Loading face detection model")
-ort_session = ort.InferenceSession(app.config['FACE_DETECTION_MODEL'])
+
 print(" * Loading face aligner")
 shape_predictor = dlib.shape_predictor(app.config['FACIAL_LANDMARK'])
 fa = face_utils.facealigner.FaceAligner(shape_predictor, desiredFaceWidth=112, desiredLeftEye=(0.3, 0.3))
