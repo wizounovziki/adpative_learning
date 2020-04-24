@@ -108,12 +108,12 @@ class adaptiveTest:
             self.items = self.gen_item_bank(bank_size=200)
             
         elif isinstance(items,str):
-            self.questions_df = pd.read_csv(items,
-                                            converters={i:str for i in ['A','B','C','D','Answer']})
-            # # print(self.questions_df)                                
+            self.questions_df = pd.read_excel(items,
+                                            converters={i:str for i in ['A','B','C','D','answer']})
+            # # print(self.questions_df)                             
             self.items = np.zeros((self.questions_df.shape[0],5))
             self.items[:,0] = 1.0
-            self.items[:,1] = self.questions_df['Difficulty'].values
+            self.items[:,1] = self.questions_df['difficulty'].values
             self.items[:,2] = 0.0
             self.items[:,3] = 1.0
             self.items[:,4] = 0.0
@@ -239,7 +239,27 @@ class adaptiveTest:
     
     def check_correct_answer(self,question_id,choice):
         # single answer
-        return bool((self.questions_df.loc[self.questions_df['ID']==question_id,'Answer']==choice).values[0])
+        # print("check loc....")
+        # print(self.questions_df.loc[self.questions_df['id']==question_id,'is_mcq'])
+        # print(self.questions_df.loc[self.questions_df['id']==question_id].values)
+        # print(self.questions_df.loc[self.questions_df['id']==question_id,'is_mcq'].values[0])
+        # print("check end....")
+        if self.questions_df.loc[self.questions_df['id']==question_id,'is_mcq'].values[0] == "Yes":
+            return bool((self.questions_df.loc[self.questions_df['id']==question_id,'answer']==choice).values[0])
+        else:
+            if "&" in self.questions_df.loc[self.questions_df['id']==question_id,'answer'].values[0]:
+                if not "&" in choice:
+                    return False
+                else:
+                    answers = (self.questions_df.loc[self.questions_df['id']==question_id,'answer']).split("&")
+                    trans_result = ""
+                    for an in answers:
+                        trans_result+=self.questions_df.loc[self.questions_df['id']==question_id,str(an)].values[0]
+                        trans_result+="&"
+                    trans_result = trans_result[:-1]
+                    return bool(trans_result==choice)
+            else:                          
+                return(bool((self.questions_df.loc[self.questions_df['id']==question_id,'A']==choice).values[0]))
     
     def update_response(self,student_id, session_id,response,ind=-1):
         # temporary function to conclude data from pics
@@ -254,7 +274,7 @@ class adaptiveTest:
             print("time1:"+str(time1))
             print("time2:"+str(time2))
             tests = Results.query.all()
-            print("db last col:"+str(tests[-1].time_stamp))
+            # print("db last col:"+str(tests[-1].time_stamp))
             results = Results.query.filter(Results.student_id==student_id,Results.time_stamp<time1,Results.time_stamp>time2).all()
             rs = []
             method = "distraction"
@@ -287,9 +307,12 @@ class adaptiveTest:
         examinee = self.active_examinees[str(student_id)+str(session_id)]
         
         if ind==-1:
+            print("lenth compare:",str(len(examinee['administered_items'])),str(len(examinee['responses'])+1))
             if len(examinee['administered_items'])==len(examinee['responses'])+1:
                 examinee['submitted_answer'] += [response]
                 response = self.check_correct_answer(examinee['administered_items'][-1],response)
+                print("Correct or not:")
+                print(response)
                 examinee['responses'] += [response]
                 examinee['responses_ts'] += [datetime.datetime.now().timestamp()]
                 # # print("************ first ************")
@@ -353,7 +376,7 @@ class adaptiveTest:
                     db.session.flush()
                     db.session.commit()
             
-            return self.questions_df.loc[self.questions_df['ID']==examinee['administered_items'][0],:].to_dict('record')[0]
+            return self.questions_df.loc[self.questions_df['id']==examinee['administered_items'][0],:].to_dict('record')[0]
         else:
             # not first question
             
@@ -389,7 +412,7 @@ class adaptiveTest:
                             quiz.details = examinee
                             db.session.flush()
                             db.session.commit()
-                    return self.questions_df.loc[self.questions_df['ID']==item_index,:].to_dict('record')[0]
+                    return self.questions_df.loc[self.questions_df['id']==item_index,:].to_dict('record')[0]
                 else:
                     # question run out finished
                     return None
@@ -399,7 +422,8 @@ class adaptiveTest:
         
 
 def unit_test():
-    test = adaptiveTest(items='Math/P1-2_processed.csv')
+    # test = adaptiveTest(items='Math/P1-2_processed.csv')
+    test = adaptiveTest(items='Math/dataset_20200420.xlsx')
     
     # # print('Registration-test')
 
@@ -424,7 +448,7 @@ def unit_test():
 
 
 def student_test_skill():
-    test = adaptiveTest(items='Math/P1-2_processed.csv')
+    test = adaptiveTest(items='Math/dataset_20200420.xlsx')
     test.register_examinee('0','1','quiz_1')
     while test.get_question_index('0','1'):
         test.update_response('0','1','D')
@@ -434,7 +458,7 @@ def student_test_skill():
 
 
 def student_simulate(testdb):
-    test = adaptiveTest(items='Math/P1-2_processed.csv',database=testdb)
+    test = adaptiveTest(items='Math/dataset_20200420.xlsx',database=testdb)
     ## print(len(test.items))
     test.register_examinee('student4','session4','quiz_1')
     while test.get_question_index('student4','session4'):

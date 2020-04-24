@@ -28,7 +28,7 @@ app.config['META_FOLDER'] = './storage/identity_meta'
 app.config['IMAGE_UPLOAD_FOLDER'] = './storage/uploads/images'
 # mysql config
 # 'debian-sys-maint'+':'+'yGdsPQQ7Zl7lVUCi'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://debian-sys-maint:yGdsPQQ7Zl7lVUCi@localhost/adaptive_learning'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:BreakingBad@localhost/adaptive_learning'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # for adaptive test
 app.config['SECRET_KEY'] = 'top_secret123xxxyyy'
@@ -106,6 +106,6 @@ if __name__ == '__main__':
     from apis import distraction_api
     app.register_blueprint(distraction_api)
 
-    # app.run(host='0.0.0.0', port=5000, debug=False,threaded=True)
-    serve(app, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    # serve(app, host='0.0.0.0', port=5000)
     

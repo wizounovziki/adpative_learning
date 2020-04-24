@@ -3,7 +3,7 @@
 # @Date:   2019-11-29 09:04:26
 # @Last Modified by:   fyr91
 # @Last Modified time: 2019-12-11 12:39:06
-import os, uuid, json, cv2
+import os, uuid, json, cv2,xlrd
 import numpy as np
 from app import app, emotion_model,faceCascade,detector,eye_predictor,db
 from werkzeug.utils import secure_filename
@@ -31,7 +31,7 @@ import adaptive.adaptive_test as adt
 # initialize the adaptive test
 # 'debian-sys-maint','yGdsPQQ7Zl7lVUCi'
 adt_db = adt.dataBase('debian-sys-maint','yGdsPQQ7Zl7lVUCi','adaptive_learning')
-adt_test = adt.adaptiveTest(items='./adaptive/Math/P1-2_processed.csv',database=adt_db)
+adt_test = adt.adaptiveTest(items='./adaptive/Math/dataset_20200420.xlsx',database=adt_db)
 
 # to be remove after solving unity client session
 session = {}
@@ -62,7 +62,7 @@ def adaptive_test():
     # global template
     global is_updated
     if request.method=='POST':
-        input_data = request.get_json()       
+        input_data = request.form       
         # register student for test session
         if input_data['command']=='new':
             if str(input_data['id']) in session:
@@ -151,14 +151,17 @@ def adaptive_test():
                                })
                 else:
                     # is_updated = True
-                    return json.dumps({'id':input_data['id'],
-                                    'session_id': input_data['session_id'],
-                                    'question_id': str(question['ID']),
-                                    'question': question['Question'],
-                                    'choices': {item:question[item] for item in ['A','B','C','D']},
-                                    'correct_answer': question['Answer'],
-                                    'status' : 'quiz_question',
-                                   })
+                    ques = {'id':input_data['id'],
+                            'session_id': input_data['session_id'],
+                            'question_id': str(question['id']),
+                            'question': question['question'],
+                            'choices': {item:question[item] for item in ['A','B','C','D']},
+                            'correct_answer': question['answer'],
+                            'status' : 'quiz_question',
+                            'is_mcq':question["is_mcq"],
+                            'image':question["base64"]
+                            }
+                    return json.dumps(ques)
             else:
                 return jsonify({'id':input_data['id'],
                                 'session_id': input_data['session_id'],
@@ -169,6 +172,7 @@ def adaptive_test():
             print("answer")
             status = adt_test.update_response(input_data['id'],input_data['session_id'],input_data['chosen_answer'])
             # print(adt_test.active_examinees)
+            print(status)
             if status:
                 is_updated = True
                 return json.dumps({'id':input_data['id'],
@@ -185,7 +189,7 @@ def adaptive_test():
                 
 
 # initialize the adaptive test
-adt_test = adt.adaptiveTest(items='./adaptive/Math/P1-2_processed.csv',database=adt_db)
+adt_test = adt.adaptiveTest(items='./adaptive/Math/dataset_20200420.xlsx',database=adt_db)
 
 portrait_api = Blueprint('portrait',__name__)
 @portrait_api.route('/portrait/<path:path>')
@@ -204,29 +208,67 @@ def create_db():
 question_init_api = Blueprint('question_init',__name__)
 @question_init_api.route('/question_init',methods=['GET'])
 def init_question():
-    template = {'id':1,'primary':'P1','question':'9 ones is the same as____','A':'7','B':'3','C':'9','D':'5','answer':'C','category':'numbers','difficulty':'-3.0'}
-    with open('./adaptive/Math/P1-2_processed.csv','r') as qs:
-        reader = csv.reader(qs)
-        for col,rows in enumerate(reader):
-            if col>0:
-                template['id'] = rows[0]
-                template['primary'] = str(rows[1])
-                template['question'] = str(rows[2])
-                template['A'] = str(rows[3])
-                template['B'] = str(rows[4])
-                template['C'] = str(rows[5])
-                template['D'] = str(rows[6])
-                template['answer'] = str(rows[7])
-                template['category'] = str(rows[8])
-                template['difficulty'] = str(rows[9])
-                if Question.query.get(template['id']) is None:                
-                    q = Question(
-                        id = int(template['id']),
-                        data =template    
-                    )
-                    db.session.add(q)
-                    db.session.commit()
-    return jsonify({"msg":"success"})
+    testing_data = []
+    # template = {'id':1,'primary':'P1','question':'9 ones is the same as____','A':'7','B':'3','C':'9','D':'5','answer':'C','category':'numbers','difficulty':'-3.0'}
+    # with open('./adaptive/Math/dataset_20200420.xlsx','r',errors='ignore',encoding='utf-8') as qs:
+    #     reader = csv.reader(qs)
+    #     for col,rows in enumerate(reader):
+    #         try:
+    #             if col == 0:
+    #                 print(rows)
+    #                 testing_data = rows
+    #             if col>0:
+    #                 # print(rows[19])
+    #                 if rows[19]=="No":
+    #                     print(str(rows[5]))
+    #         except:
+    #             print(col)
+    #             template['id'] = rows[0]
+    #             template['primary'] = str(rows[1])
+    #             template['question'] = str(rows[2])
+    #             template['A'] = str(rows[3])
+    #             template['B'] = str(rows[4])
+    #             template['C'] = str(rows[5])
+    #             template['D'] = str(rows[6])
+    #             template['answer'] = str(rows[7])
+    #             template['category'] = str(rows[8])
+    #             template['difficulty'] = str(rows[9])
+    #             if Question.query.get(template['id']) is None:                
+    #                 q = Question(
+    #                     id = int(template['id']),
+    #                     data =template    
+    #                 )
+    #                 db.session.add(q)
+    #                 db.session.commit()
+    
+    # new_template = {'id':1,'level':'P1',"subject":"Math",'question':'9 ones is the same as____',"is_mcq":"Yes",
+    #                 'A':'7','B':'3','C':'9','D':'5','answer':'C','category':'numbers','difficulty':'-3.0',"marks":1,
+    #                 'year':2019,"school":"sample","exam":"CA1","paper":"","number":0,"image":"No","image_file":"","base64":""}
+
+    data = xlrd.open_workbook("./adaptive/Math/dataset_20200420.xlsx")
+    questions = data.sheet_by_index(0)
+    nrows = questions.nrows
+    column_names = []
+    for i in range(nrows):
+        if i<=0:
+            column_names = questions.row_values(i)
+        else:
+            row_data = {}
+            for idx in range(0,len(column_names)):
+                row_data[column_names[idx]] = questions.row_values(i)[idx]
+            testing_data.append(row_data)
+            if Question.query.get(row_data['id']) is None:                
+                q = Question(
+                    id = int(row_data['id']),
+                    data = row_data    
+                )
+                db.session.add(q)
+                db.session.commit()    
+        # new_template["id"] = questions.row_values(i)[0]
+        # new_template["level"] = questions.row_values(i)[1]
+        # new_template["question"] = question.
+        # testing_data.append(new_template)
+    return jsonify(testing_data[0])
 
 
 quiz_log_api = Blueprint('quiz_log',__name__)
