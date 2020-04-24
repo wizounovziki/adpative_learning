@@ -159,7 +159,8 @@ def adaptive_test():
                             'correct_answer': question['answer'],
                             'status' : 'quiz_question',
                             'is_mcq':question["is_mcq"],
-                            'image':question["base64"]
+                            "is_image":question["image"],
+                            'image':question["base64"],
                             }
                     return json.dumps(ques)
             else:
