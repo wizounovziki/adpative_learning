@@ -24,9 +24,10 @@ There might be some missing libs in the txt file,please try to implement accordi
 There might be situationns when dlib is not installed successfully.Please run `pip install cmake` and then `pip install dlib` manually.
 
 ### install mysql and set up
-In app.py you can found `app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://debian-sys-maint:yGdsPQQ7Zl7lVUCi@localhost/adaptive_learning'`;
+In app.py you can found `app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://debian-sys-                      maint:yGdsPQQ7Zl7lVUCi@localhost/adaptive_learning'`;
 In api.py you can found `adt_db = adt.dataBase('debian-sys-maint','yGdsPQQ7Zl7lVUCi','adaptive_learning')`.
 In this two place you can replace the username and password to your own.Actually the one in api.py is not used so far.
+Then create a schema named "adaptive_learning"
 
 ### init for the database
 In directory run `python app.py` to start the back-end.It is taking port 5000,you can change it in app.py.
