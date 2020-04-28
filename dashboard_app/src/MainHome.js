@@ -2,7 +2,7 @@ import React from "react";
 
 import background from "./assets/isometric-teamwork-office-vector.jpg";
 
-import { Button, Paper, Typography } from "@material-ui/core";
+import { Button, Divider, Paper, Typography } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";
 
@@ -12,7 +12,7 @@ import GoogleClassroomIcon from "mdi-react/GoogleClassroomIcon";
 import MainNavBar from "./MainNavBar";
 
 const useStyles = makeStyles(theme => ({
-  main: {
+  body: {
     display: "flex",
     width: "100%",
     flexWrap: "wrap",
@@ -22,10 +22,12 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "white"
   },
   backgroundImage: {
-    bottom: 20,
-    height: 650,
-    right: 20,
-    position: "absolute"
+    bottom: 80,
+    height: "75%",
+    maxHeight: 650,
+    right: 50,
+    position: "absolute",
+    zIndex: 0
   },
   button: {
     backgroundColor: "#fff",
@@ -37,7 +39,8 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "flex-end",
     marginRight: 32,
     padding: 32,
-    width: 120
+    width: 120,
+    zIndex: 1
   },
   buttonMainContainer: {
     alignItems: "flex-start",
@@ -62,6 +65,22 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700,
     textTransform: "uppercase"
     // marginTop: "auto"
+  },
+  divider: {
+    width: "90%"
+  },
+  footer: {
+    display: "flex",
+    justifyContent: "center",
+    width: "100%"
+  },
+  layout: {
+    display: "flex",
+    flexDirection: "column"
+  },
+  margin: {
+    display: "flex",
+    margin: theme.spacing(1)
   }
 }));
 
@@ -77,35 +96,42 @@ function MainHome() {
   };
 
   return (
-    <React.Fragment>
-      <MainNavBar />
-      <div className={classes.main}>
-        <div className={classes.buttonMainContainer}>
-          <Paper
-            elevation={5}
-            className={classes.button}
-            onClick={handleMonitorClick}
-          >
-            <GoogleClassroomIcon className={classes.buttonIcon} />
-            <Typography className={classes.buttonText}>
-              Virtual Classroom
-            </Typography>
-          </Paper>
-          <Paper
-            elevation={5}
-            className={classes.button}
-            onClick={handleSummaryClick}
-            href="/summary"
-          >
-            <PollIcon className={classes.buttonIcon} />
-            <Typography className={classes.buttonText}>
-              Class Progress
-            </Typography>
-          </Paper>
+    <>
+      <div className={classes.layout}>
+        <MainNavBar />
+        <div className={classes.body}>
+          <div className={classes.buttonMainContainer}>
+            <Paper
+              elevation={5}
+              className={classes.button}
+              onClick={handleMonitorClick}
+            >
+              <GoogleClassroomIcon className={classes.buttonIcon} />
+              <Typography className={classes.buttonText}>
+                Virtual Classroom
+              </Typography>
+            </Paper>
+            <Paper
+              elevation={5}
+              className={classes.button}
+              onClick={handleSummaryClick}
+              href="/summary"
+            >
+              <PollIcon className={classes.buttonIcon} />
+              <Typography className={classes.buttonText}>
+                Class Progress
+              </Typography>
+            </Paper>
+          </div>
         </div>
         <img className={classes.backgroundImage} src={background} />
       </div>
-    </React.Fragment>
+      <div className={classes.margin} />
+      <div className={classes.margin} />
+      <div className={classes.footer}>
+        <Divider className={classes.divider} />
+      </div>
+    </>
   );
 }
 
